@@ -43,14 +43,14 @@ export function Home() {
             {/* CTA Buttons */}
             <div className="flex flex-col sm:flex-row items-center justify-center gap-4 mb-12">
               <Link to="/apply">
-                <Button size="lg" className="shadow-2xl min-w-[200px]">
+                <Button size="lg" className="shadow-2xl min-w-50">
                   Apply for Loan
                   <ArrowRight className="w-5 h-5 ml-2" />
                 </Button>
               </Link>
               {isConnected && (
                 <Link to="/my-loans">
-                  <Button variant="secondary" size="lg" className="shadow-xl min-w-[200px]">
+                  <Button variant="secondary" size="lg" className="shadow-xl min-w-50">
                     View My Loans
                   </Button>
                 </Link>

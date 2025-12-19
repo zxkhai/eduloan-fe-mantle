@@ -355,7 +355,7 @@ export function Admin() {
             <CardContent>
               {approvedLoans.length === 0 ? (
                 <div className="text-center py-8">
-                  <Banknote className="w-12 h-12 text-[var(--ocean-500)] mx-auto mb-2" />
+                  <Banknote className="w-12 h-12 text-(--ocean-500) mx-auto mb-2" />
                   <p className="text-gray-600 text-sm font-medium">No loans ready for disbursement</p>
                 </div>
               ) : (

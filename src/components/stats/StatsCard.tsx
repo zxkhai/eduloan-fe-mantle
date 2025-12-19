@@ -19,7 +19,7 @@ export function StatsCard({ title, value, icon, description }: StatsCardProps) {
           </p>
           {description && <p className="mt-2 text-xs text-[#4b6b80] font-medium">{description}</p>}
         </div>
-        <div className="p-3 bg-ocean/10 rounded-xl shadow-sm group-hover:shadow-md transition-all duration-300 text-[var(--ocean-500)]">
+        <div className="p-3 bg-ocean/10 rounded-xl shadow-sm group-hover:shadow-md transition-all duration-300 text-(--ocean-500)">
           {icon}
         </div>
       </div>

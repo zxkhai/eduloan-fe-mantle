@@ -57,7 +57,7 @@ export function LoanStatusInfo({ status }: LoanStatusInfoProps) {
   return (
     <div className={`p-4 rounded-lg ${info.bgColor}`}>
       <div className="flex items-start gap-3">
-        <Icon className={`w-5 h-5 ${info.color} flex-shrink-0 mt-0.5`} />
+        <Icon className={`w-5 h-5 ${info.color} shrink-0 mt-0.5`} />
         <div>
           <p className={`font-medium ${info.color}`}>{info.title}</p>
           <p className="text-sm text-gray-600 mt-1">{info.description}</p>
@@ -76,6 +76,22 @@ export function DeadlineInfo({ deadline }: DeadlineInfoProps) {
 
   const now = Math.floor(Date.now() / 1000);
   const deadlineNum = Number(deadline);
+  
+  // Check if deadline is valid (not in far future)
+  if (deadlineNum > 2000000000) {
+    return (
+      <div className="p-4 rounded-lg bg-yellow-50">
+        <div className="flex items-start gap-3">
+          <Timer className="w-5 h-5 shrink-0 mt-0.5 text-yellow-500" />
+          <div>
+            <p className="font-medium text-yellow-700">Deadline Not Set</p>
+            <p className="text-sm text-gray-600 mt-1">Deadline will be set after disbursement</p>
+          </div>
+        </div>
+      </div>
+    );
+  }
+  
   const remaining = deadlineNum - now;
   const daysRemaining = Math.ceil(remaining / 86400);
   const isOverdue = remaining < 0;
@@ -83,7 +99,7 @@ export function DeadlineInfo({ deadline }: DeadlineInfoProps) {
   return (
     <div className={`p-4 rounded-lg ${isOverdue ? 'bg-red-50' : 'bg-blue-50'}`}>
       <div className="flex items-start gap-3">
-        <Timer className={`w-5 h-5 flex-shrink-0 mt-0.5 ${isOverdue ? 'text-red-500' : 'text-blue-500'}`} />
+        <Timer className={`w-5 h-5 shrink-0 mt-0.5 ${isOverdue ? 'text-red-500' : 'text-blue-500'}`} />
         <div>
           <p className={`font-medium ${isOverdue ? 'text-red-500' : 'text-blue-500'}`}>
             {isOverdue ? 'Overdue' : 'Time Remaining'}

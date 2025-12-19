@@ -16,21 +16,23 @@ interface LoanCardProps {
 
 export function LoanCard({ loan, onMakePayment, showActions = true }: LoanCardProps) {
   return (
-    <Card className="hover:shadow-md transition-shadow">
+    <Card hover className="group">
       {/* Header */}
       <div className="flex items-center justify-between mb-4">
-        <span className="text-sm text-gray-500">Loan #{loan.loanId.toString()}</span>
+        <span className="text-sm font-semibold text-[#054460]">Loan #{loan.loanId.toString()}</span>
         <LoanStatusBadge status={loan.status} />
       </div>
 
       {/* Amount */}
       <div className="mb-4">
-        <p className="text-2xl font-bold text-gray-900">{formatMNT(loan.principalAmount)}</p>
-        <p className="text-sm text-gray-500">Total: {formatMNT(loan.totalAmount)}</p>
+        <p className="text-3xl font-bold text-ocean">
+          {formatMNT(loan.principalAmount)}
+        </p>
+        <p className="text-sm text-[#4b6b80] font-medium mt-1">Total: {formatMNT(loan.principalAmount + (loan.principalAmount * 5n) / 100n)}</p>
       </div>
 
       {/* Purpose */}
-      <p className="text-sm text-gray-600 mb-4 line-clamp-2">{loan.purpose}</p>
+      <p className="text-sm text-[#4b6b80] mb-4 line-clamp-2 leading-relaxed">{loan.purpose}</p>
 
       {/* Progress (for Active loans) */}
       {loan.status === LoanStatus.Active && (
@@ -40,21 +42,21 @@ export function LoanCard({ loan, onMakePayment, showActions = true }: LoanCardPr
       )}
 
       {/* Date */}
-      <p className="text-xs text-gray-400 mb-4">Applied: {formatDate(loan.applicationTime)}</p>
+      <p className="text-xs text-[#6b8fa6] mb-4 font-medium">Applied: {formatDate(loan.applicationTime)}</p>
 
       {/* Actions */}
       {showActions && (
         <div className="flex items-center gap-2">
           {loan.status === LoanStatus.Active && onMakePayment && (
-            <Button onClick={onMakePayment} className="flex-1">
-              Make Payment
-            </Button>
+              <Button onClick={onMakePayment} className="flex-1">
+                Make Payment
+              </Button>
           )}
           <Link to={`/loan/${loan.loanId}`} className="flex-1">
-            <Button variant="secondary" className="w-full">
-              View Details
-              <ArrowRight className="w-4 h-4 ml-1" />
-            </Button>
+              <Button variant="secondary" className="w-full group-hover:border-[#39bfff]">
+                View Details
+                <ArrowRight className="w-4 h-4 ml-1 group-hover:translate-x-0.5 transition-transform" style={{ color: 'var(--ocean-500)' }} />
+              </Button>
           </Link>
         </div>
       )}

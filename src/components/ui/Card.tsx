@@ -2,21 +2,24 @@ import { forwardRef } from 'react';
 import type { HTMLAttributes } from 'react';
 
 interface CardProps extends HTMLAttributes<HTMLDivElement> {
-  variant?: 'default' | 'featured';
+  variant?: 'default' | 'featured' | 'gradient';
+  hover?: boolean;
 }
 
 export const Card = forwardRef<HTMLDivElement, CardProps>(
-  ({ className = '', variant = 'default', children, ...props }, ref) => {
-    const baseStyles = 'bg-white rounded-xl p-6 shadow-sm';
+  ({ className = '', variant = 'default', hover = false, children, ...props }, ref) => {
+    const baseStyles = 'relative glass rounded-2xl p-6 shadow-lg transition-all duration-300';
 
     const variants = {
-      default: 'border border-gray-100',
-      featured:
-        'relative before:absolute before:inset-0 before:-z-10 before:rounded-xl before:p-[1px] before:bg-gradient-to-r before:from-[#F2A9DD] before:via-[#C8B2F5] before:to-[#F7FAE4]',
+      default: 'border border-white/30',
+      featured: 'relative border-2 border-transparent bg-ocean',
+      gradient: 'bg-ocean text-white',
     };
 
+    const hoverStyles = hover ? 'hover:shadow-2xl hover:-translate-y-2 hover:scale-[1.02] cursor-pointer' : '';
+
     return (
-      <div ref={ref} className={`${baseStyles} ${variants[variant]} ${className}`} {...props}>
+      <div ref={ref} className={`${baseStyles} ${variants[variant]} ${hoverStyles} ${className}`} {...props}>
         {children}
       </div>
     );

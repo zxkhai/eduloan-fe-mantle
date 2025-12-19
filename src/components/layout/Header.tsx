@@ -19,27 +19,29 @@ export function Header() {
   const isActive = (href: string) => location.pathname === href;
 
   return (
-    <header className="bg-white border-b border-gray-100 sticky top-0 z-50">
+    <header className="glass glass-soft backdrop-blur-xl border-b border-white/10 sticky top-0 z-50 shadow-lg">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex items-center justify-between h-16">
           {/* Logo */}
-          <Link to="/" className="flex items-center gap-2">
-            <div className="w-8 h-8 rounded-lg bg-linear-to-r from-[#F2A9DD] via-[#C8B2F5] to-[#F7FAE4] flex items-center justify-center">
-              <GraduationCap className="w-5 h-5 text-gray-800" />
+          <Link to="/" className="flex items-center gap-2.5 group">
+            <div className="w-10 h-10 rounded-xl bg-ocean flex items-center justify-center shadow-md group-hover:shadow-lg transition-all duration-300">
+              <GraduationCap className="w-6 h-6 text-white" />
             </div>
-            <span className="font-bold text-lg text-gray-900">EduLoan</span>
+            <span className="font-bold text-xl text-[#07203a]">
+              EduLoan
+            </span>
           </Link>
 
           {/* Desktop Navigation */}
-          <nav className="hidden md:flex items-center gap-1">
+          <nav className="hidden md:flex items-center gap-2">
             {navLinks.map((link) => (
               <Link
                 key={link.href}
                 to={link.href}
-                className={`px-4 py-2 text-sm font-medium rounded-md transition-colors ${
-                  isActive(link.href)
-                    ? 'text-gray-900 bg-gray-100'
-                    : 'text-gray-600 hover:text-gray-900 hover:bg-gray-50'
+                className={`px-4 py-2 text-sm font-semibold rounded-lg transition-all duration-200 ${
+                      isActive(link.href)
+                        ? 'text-[#07203a] bg-white/18 backdrop-blur-sm shadow-md'
+                        : 'text-[#054460] hover:text-[#07203a] hover:bg-white/8'
                 }`}
               >
                 {link.label}
@@ -66,7 +68,7 @@ export function Header() {
 
             {/* Mobile menu button */}
             <button
-              className="md:hidden p-2 text-gray-600 hover:text-gray-900"
+              className="md:hidden p-2 text-[#054460]/90 hover:text-[#07203a] hover:bg-white/8 rounded-lg transition-colors"
               onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
             >
               {mobileMenuOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
@@ -76,16 +78,16 @@ export function Header() {
 
         {/* Mobile Navigation */}
         {mobileMenuOpen && (
-          <nav className="md:hidden py-4 border-t border-gray-100">
+          <nav className="md:hidden py-4 border-t border-white/10 animate-fade-in">
             {navLinks.map((link) => (
               <Link
                 key={link.href}
                 to={link.href}
                 onClick={() => setMobileMenuOpen(false)}
-                className={`block px-4 py-2 text-sm font-medium rounded-md transition-colors ${
+                className={`block px-4 py-2.5 text-sm font-semibold rounded-lg transition-all duration-200 mb-1 ${
                   isActive(link.href)
-                    ? 'text-gray-900 bg-gray-100'
-                    : 'text-gray-600 hover:text-gray-900 hover:bg-gray-50'
+                    ? 'text-[#07203a] bg-white/20 backdrop-blur-sm'
+                    : 'text-[#054460] hover:text-[#07203a] hover:bg-white/10'
                 }`}
               >
                 {link.label}

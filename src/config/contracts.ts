@@ -1,4 +1,4 @@
-export const eduLoanAddress = '0x8560E47488C92aE356d22a216DBB58FddbBa000A' as const;
+export const eduLoanAddress = '0x0b16fAEab87279BA9ecF7f6530172c8c3eb4d653' as const;
 
 export const eduLoanABI = [
   {
@@ -185,8 +185,22 @@ export const eduLoanABI = [
     type: 'function',
   },
   {
+    inputs: [{ internalType: 'uint256', name: '_loanId', type: 'uint256' }],
+    name: 'getApprovalTime',
+    outputs: [{ internalType: 'uint256', name: '', type: 'uint256' }],
+    stateMutability: 'view',
+    type: 'function',
+  },
+  {
     inputs: [],
     name: 'getContractBalance',
+    outputs: [{ internalType: 'uint256', name: '', type: 'uint256' }],
+    stateMutability: 'view',
+    type: 'function',
+  },
+  {
+    inputs: [{ internalType: 'uint256', name: '_loanId', type: 'uint256' }],
+    name: 'getDeadline',
     outputs: [{ internalType: 'uint256', name: '', type: 'uint256' }],
     stateMutability: 'view',
     type: 'function',

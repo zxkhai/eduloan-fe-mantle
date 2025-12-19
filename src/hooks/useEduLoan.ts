@@ -89,3 +89,27 @@ export function useCalculateInterest(amount: bigint | undefined) {
     },
   });
 }
+
+export function useGetApprovalTime(loanId: bigint | undefined) {
+  return useReadContract({
+    address: eduLoanAddress,
+    abi: eduLoanABI,
+    functionName: 'getApprovalTime',
+    args: loanId !== undefined ? [loanId] : undefined,
+    query: {
+      enabled: loanId !== undefined,
+    },
+  });
+}
+
+export function useGetDeadline(loanId: bigint | undefined) {
+  return useReadContract({
+    address: eduLoanAddress,
+    abi: eduLoanABI,
+    functionName: 'getDeadline',
+    args: loanId !== undefined ? [loanId] : undefined,
+    query: {
+      enabled: loanId !== undefined,
+    },
+  });
+}

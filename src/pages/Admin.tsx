@@ -14,6 +14,7 @@ import {
   useTotalLoans,
   useContractBalance,
   useMultipleLoanDetails,
+  useGetApprovalTime,
 } from '../hooks/useEduLoan';
 import {
   useApproveLoan,
@@ -25,6 +26,51 @@ import {
 import { formatMNT, formatMNTShort, formatDate, shortenAddress } from '../lib/format';
 import type { Loan } from '../types';
 import { LoanStatus } from '../types';
+
+interface ApprovedLoanItemProps {
+  loan: Loan;
+  isDisbursing: boolean;
+  contractBalance: bigint | undefined;
+  onDisburse: () => void;
+}
+
+function ApprovedLoanItem({ loan, isDisbursing, contractBalance, onDisburse }: ApprovedLoanItemProps) {
+  const { data: approvalTime } = useGetApprovalTime(loan.loanId);
+
+  return (
+    <div className="p-4 border border-gray-100 rounded-lg">
+      <div className="flex items-start justify-between mb-3">
+        <div>
+          <p className="font-medium text-gray-900">Loan #{loan.loanId.toString()}</p>
+          <p className="text-sm text-gray-500">{shortenAddress(loan.borrower)}</p>
+        </div>
+        <LoanStatusBadge status={loan.status} />
+      </div>
+      <div className="grid grid-cols-2 gap-4 mb-3 text-sm">
+        <div>
+          <p className="text-gray-500">Amount to Disburse</p>
+          <p className="font-medium">{formatMNT(loan.principalAmount)}</p>
+        </div>
+        <div>
+          <p className="text-gray-500">Approved</p>
+          <p className="font-medium">{approvalTime !== undefined ? formatDate(BigInt(approvalTime)) : '-'}</p>
+        </div>
+      </div>
+      <Button
+        size="sm"
+        onClick={onDisburse}
+        isLoading={isDisbursing}
+        disabled={isDisbursing || (contractBalance !== undefined && contractBalance < loan.principalAmount)}
+      >
+        <Banknote className="w-4 h-4 mr-1" />
+        Disburse Funds
+      </Button>
+      {contractBalance !== undefined && contractBalance < loan.principalAmount && (
+        <p className="text-xs text-red-500 mt-2">Insufficient contract balance</p>
+      )}
+    </div>
+  );
+}
 
 export function Admin() {
   const { isConnected } = useAccount();
@@ -144,70 +190,95 @@ export function Admin() {
   }
 
   return (
-    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 animate-fade-in">
       {/* Header */}
-      <div className="mb-8">
-        <h1 className="text-3xl font-bold text-gray-900">Admin Dashboard</h1>
-        <p className="text-gray-500 mt-1">Manage loans and contract funds</p>
+      <div className="mb-10">
+        <div className="flex items-center gap-3 mb-3">
+          <div className="w-12 h-12 rounded-xl bg-ocean flex items-center justify-center shadow-md">
+            <Shield className="w-6 h-6 text-white" />
+          </div>
+          <div>
+            <h1 className="text-4xl font-bold text-[#07203a]">Admin Dashboard</h1>
+            <p className="text-[#054460] font-medium mt-1">Manage loans and contract funds</p>
+          </div>
+        </div>
       </div>
 
       {/* Stats */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
-        <StatsCard
-          title="Total Loans"
-          value={totalLoans?.toString() || '0'}
-          icon={<TrendingUp className="w-5 h-5 text-[#C8B2F5]" />}
-        />
-        <StatsCard
-          title="Contract Balance"
-          value={contractBalance ? formatMNTShort(contractBalance) : '0 MNT'}
-          icon={<Wallet className="w-5 h-5 text-[#C8B2F5]" />}
-        />
-        <StatsCard
-          title="Pending"
-          value={pendingLoans.length.toString()}
-          icon={<AlertCircle className="w-5 h-5 text-orange-500" />}
-        />
-        <StatsCard
-          title="Active"
-          value={activeLoans.length.toString()}
-          icon={<Banknote className="w-5 h-5 text-green-500" />}
-        />
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-10">
+          <div className="animate-scale-in">
+          <StatsCard
+            title="Total Loans"
+            value={totalLoans?.toString() || '0'}
+              icon={<TrendingUp className="w-5 h-5" style={{ color: 'var(--ocean-500)' }} />}
+          />
+        </div>
+          <div className="animate-scale-in" style={{ animationDelay: '0.1s' }}>
+          <StatsCard
+            title="Contract Balance"
+            value={contractBalance ? formatMNTShort(contractBalance) : '0 MNT'}
+              icon={<Wallet className="w-5 h-5" style={{ color: 'var(--ocean-500)' }} />}
+          />
+        </div>
+        <div className="animate-scale-in" style={{ animationDelay: '0.2s' }}>
+          <StatsCard
+            title="Pending"
+            value={pendingLoans.length.toString()}
+            icon={<AlertCircle className="w-5 h-5 text-orange-500" />}
+          />
+        </div>
+        <div className="animate-scale-in" style={{ animationDelay: '0.3s' }}>
+          <StatsCard
+            title="Active"
+            value={activeLoans.length.toString()}
+            icon={<Banknote className="w-5 h-5 text-green-500" />}
+          />
+        </div>
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
         {/* Loans Management */}
         <div className="lg:col-span-2 space-y-6">
           {/* Pending Loans */}
-          <Card>
+          <Card className="shadow-lg">
             <CardHeader>
-              <CardTitle>Pending Loans ({pendingLoans.length})</CardTitle>
+              <div className="flex items-center justify-between">
+                <CardTitle>Pending Loans ({pendingLoans.length})</CardTitle>
+                {pendingLoans.length > 0 && (
+                  <span className="px-2.5 py-1 bg-orange-100 text-orange-700 text-xs font-bold rounded-full">
+                    Review Needed
+                  </span>
+                )}
+              </div>
             </CardHeader>
             <CardContent>
               {pendingLoans.length === 0 ? (
-                <p className="text-gray-500 text-sm">No pending loans</p>
+                <div className="text-center py-8">
+                  <Check className="w-12 h-12 text-green-400 mx-auto mb-2" />
+                  <p className="text-gray-500 text-sm font-medium">No pending loans</p>
+                </div>
               ) : (
                 <div className="space-y-4">
                   {pendingLoans.map((loan) => (
-                    <div key={loan.loanId.toString()} className="p-4 border border-gray-100 rounded-lg">
-                      <div className="flex items-start justify-between mb-3">
+                    <div key={loan.loanId.toString()} className="p-5 glass rounded-xl hover:shadow-lg transition-all duration-200">
+                      <div className="flex items-start justify-between mb-4">
                         <div>
-                          <p className="font-medium text-gray-900">Loan #{loan.loanId.toString()}</p>
-                          <p className="text-sm text-gray-500">{shortenAddress(loan.borrower)}</p>
+                            <p className="font-bold text-[#07203a] text-lg">Loan #{loan.loanId.toString()}</p>
+                            <p className="text-sm text-[#054460] font-medium">{shortenAddress(loan.borrower)}</p>
                         </div>
                         <LoanStatusBadge status={loan.status} />
                       </div>
-                      <div className="grid grid-cols-2 gap-4 mb-3 text-sm">
-                        <div>
-                          <p className="text-gray-500">Amount</p>
-                          <p className="font-medium">{formatMNT(loan.principalAmount)}</p>
+                        <div className="grid grid-cols-2 gap-4 mb-4 text-sm">
+                          <div className="p-3 glass-soft rounded-lg">
+                            <p className="text-gray-600 font-medium">Amount</p>
+                            <p className="font-bold text-[#07203a]">{formatMNT(loan.principalAmount)}</p>
+                          </div>
+                          <div className="p-3 glass-soft rounded-lg">
+                            <p className="text-gray-600 font-medium">Applied</p>
+                            <p className="font-semibold text-[#07203a]">{formatDate(loan.applicationTime)}</p>
+                          </div>
                         </div>
-                        <div>
-                          <p className="text-gray-500">Applied</p>
-                          <p className="font-medium">{formatDate(loan.applicationTime)}</p>
-                        </div>
-                      </div>
-                      <p className="text-sm text-gray-600 mb-4">{loan.purpose}</p>
+                        <p className="text-sm text-gray-700 mb-5 leading-relaxed p-3 glass-soft rounded-lg">{loan.purpose}</p>
 
                       {rejectingLoanId === loan.loanId ? (
                         <div className="space-y-3">
@@ -270,47 +341,33 @@ export function Admin() {
           </Card>
 
           {/* Approved Loans (Ready for Disbursement) */}
-          <Card>
+          <Card className="shadow-lg">
             <CardHeader>
-              <CardTitle>Ready for Disbursement ({approvedLoans.length})</CardTitle>
+              <div className="flex items-center justify-between">
+                <CardTitle>Ready for Disbursement ({approvedLoans.length})</CardTitle>
+                {approvedLoans.length > 0 && (
+                  <span className="px-2.5 py-1 bg-blue-100 text-blue-700 text-xs font-bold rounded-full">
+                    Action Required
+                  </span>
+                )}
+              </div>
             </CardHeader>
             <CardContent>
               {approvedLoans.length === 0 ? (
-                <p className="text-gray-500 text-sm">No loans ready for disbursement</p>
+                <div className="text-center py-8">
+                  <Banknote className="w-12 h-12 text-[var(--ocean-500)] mx-auto mb-2" />
+                  <p className="text-gray-600 text-sm font-medium">No loans ready for disbursement</p>
+                </div>
               ) : (
                 <div className="space-y-4">
                   {approvedLoans.map((loan) => (
-                    <div key={loan.loanId.toString()} className="p-4 border border-gray-100 rounded-lg">
-                      <div className="flex items-start justify-between mb-3">
-                        <div>
-                          <p className="font-medium text-gray-900">Loan #{loan.loanId.toString()}</p>
-                          <p className="text-sm text-gray-500">{shortenAddress(loan.borrower)}</p>
-                        </div>
-                        <LoanStatusBadge status={loan.status} />
-                      </div>
-                      <div className="grid grid-cols-2 gap-4 mb-3 text-sm">
-                        <div>
-                          <p className="text-gray-500">Amount to Disburse</p>
-                          <p className="font-medium">{formatMNT(loan.principalAmount)}</p>
-                        </div>
-                        <div>
-                          <p className="text-gray-500">Approved</p>
-                          <p className="font-medium">{formatDate(loan.approvalTime)}</p>
-                        </div>
-                      </div>
-                      <Button
-                        size="sm"
-                        onClick={() => disburseLoan(loan.loanId)}
-                        isLoading={isDisbursing}
-                        disabled={isDisbursing || (contractBalance !== undefined && contractBalance < loan.principalAmount)}
-                      >
-                        <Banknote className="w-4 h-4 mr-1" />
-                        {disbursePending ? 'Confirming...' : disburseConfirming ? 'Processing...' : 'Disburse Funds'}
-                      </Button>
-                      {contractBalance !== undefined && contractBalance < loan.principalAmount && (
-                        <p className="text-xs text-red-500 mt-2">Insufficient contract balance</p>
-                      )}
-                    </div>
+                    <ApprovedLoanItem
+                      key={loan.loanId.toString()}
+                      loan={loan}
+                      isDisbursing={isDisbursing}
+                      contractBalance={contractBalance}
+                      onDisburse={() => disburseLoan(loan.loanId)}
+                    />
                   ))}
                 </div>
               )}
@@ -321,9 +378,12 @@ export function Admin() {
         {/* Funds Management */}
         <div className="space-y-6">
           {/* Deposit */}
-          <Card>
+          <Card variant="gradient" className="shadow-lg">
             <CardHeader>
-              <CardTitle>Deposit Funds</CardTitle>
+              <CardTitle className="flex items-center gap-2">
+                <Wallet className="w-5 h-5" style={{ color: 'var(--ocean-500)' }} />
+                Deposit Funds
+              </CardTitle>
             </CardHeader>
             <CardContent>
               <div className="space-y-4">
@@ -338,27 +398,32 @@ export function Admin() {
                   disabled={isDepositing}
                 />
                 <Button
-                  className="w-full"
+                  className="w-full shadow-lg"
                   onClick={() => depositFunds(depositAmount)}
                   isLoading={isDepositing}
                   disabled={!depositAmount || parseFloat(depositAmount) <= 0 || isDepositing}
                 >
-                  {depositPending ? 'Confirming...' : depositConfirming ? 'Processing...' : 'Deposit'}
+                  {depositPending ? 'Confirming...' : depositConfirming ? 'Processing...' : 'Deposit Funds'}
                 </Button>
               </div>
             </CardContent>
           </Card>
 
           {/* Withdraw */}
-          <Card>
+          <Card variant="gradient" className="shadow-lg">
             <CardHeader>
-              <CardTitle>Withdraw Funds</CardTitle>
+              <CardTitle className="flex items-center gap-2">
+                <Banknote className="w-5 h-5" style={{ color: 'var(--ocean-500)' }} />
+                Withdraw Funds
+              </CardTitle>
             </CardHeader>
             <CardContent>
               <div className="space-y-4">
-                <div className="p-3 bg-gray-50 rounded-lg">
-                  <p className="text-sm text-gray-500">Available Balance</p>
-                  <p className="text-lg font-bold">{contractBalance ? formatMNT(contractBalance) : '0 MNT'}</p>
+                <div className="p-4 glass-soft rounded-xl">
+                  <p className="text-sm text-gray-600 font-medium">Available Balance</p>
+                  <p className="text-2xl font-bold text-ocean mt-1">
+                    {contractBalance ? formatMNT(contractBalance) : '0 MNT'}
+                  </p>
                 </div>
                 <Input
                   label="Amount (MNT)"
@@ -372,12 +437,12 @@ export function Admin() {
                 />
                 <Button
                   variant="secondary"
-                  className="w-full"
+                  className="w-full shadow-lg"
                   onClick={() => withdrawFunds(withdrawAmount)}
                   isLoading={isWithdrawing}
                   disabled={!withdrawAmount || parseFloat(withdrawAmount) <= 0 || isWithdrawing}
                 >
-                  {withdrawPending ? 'Confirming...' : withdrawConfirming ? 'Processing...' : 'Withdraw'}
+                  {withdrawPending ? 'Confirming...' : withdrawConfirming ? 'Processing...' : 'Withdraw Funds'}
                 </Button>
               </div>
             </CardContent>

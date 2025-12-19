@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { useAccount } from 'wagmi';
 import { ConnectButton } from '@rainbow-me/rainbowkit';
@@ -33,6 +33,8 @@ export function MyLoans() {
     refetchLoans();
   };
 
+  useCloseOnEscape(!!selectedLoanForPayment, () => setSelectedLoanForPayment(null));
+
   if (!isConnected) {
     return (
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
@@ -60,17 +62,17 @@ export function MyLoans() {
   }
 
   return (
-    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 animate-fade-in">
       {/* Header */}
-      <div className="flex items-center justify-between mb-8">
+      <div className="flex items-center justify-between mb-10">
         <div>
-          <h1 className="text-3xl font-bold text-gray-900">My Loans</h1>
-          <p className="text-gray-500 mt-1">
+          <h1 className="text-4xl font-bold text-[#07203a] mb-2">My Loans</h1>
+          <p className="text-[#054460] font-medium">
             {loans?.length || 0} loan{(loans?.length || 0) !== 1 ? 's' : ''} found
           </p>
         </div>
         <Link to="/apply">
-          <Button>
+          <Button className="shadow-lg">
             <Plus className="w-4 h-4 mr-2" />
             Apply for Loan
           </Button>
@@ -79,8 +81,11 @@ export function MyLoans() {
 
       {/* Payment Modal */}
       {selectedLoanForPayment && remainingAmount !== undefined && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50">
-          <div className="w-full max-w-md">
+        <div
+          className="fixed inset-0 z-50 flex items-center justify-center p-4 modal-backdrop animate-fade-in"
+          onClick={() => setSelectedLoanForPayment(null)}
+        >
+          <div className="w-full max-w-md animate-scale-in" onClick={(e) => e.stopPropagation()}>
             <PaymentForm
               loanId={selectedLoanForPayment.loanId}
               remainingAmount={remainingAmount}
@@ -88,7 +93,7 @@ export function MyLoans() {
             />
             <button
               onClick={() => setSelectedLoanForPayment(null)}
-              className="w-full mt-4 py-2 text-sm text-gray-500 hover:text-gray-700"
+              className="w-full mt-4 py-2 text-sm text-[#054460] hover:text-[#07203a] font-medium transition-colors"
             >
               Cancel
             </button>
@@ -98,14 +103,17 @@ export function MyLoans() {
 
       {/* Loans Grid */}
       {!loans || loans.length === 0 ? (
-        <Card className="text-center py-12">
-          <FileText className="w-12 h-12 text-gray-300 mx-auto mb-4" />
-          <h2 className="text-xl font-semibold text-gray-900 mb-2">No Loans Yet</h2>
-          <p className="text-gray-500 mb-6">
-            You haven't applied for any loans yet. Get started by applying for your first loan.
+        <Card className="text-center py-16 max-w-lg mx-auto">
+          <div className="w-16 h-16 mx-auto mb-4 rounded-2xl bg-ocean flex items-center justify-center">
+            <FileText className="w-8 h-8 text-gray-300" />
+          </div>
+          <h2 className="text-2xl font-bold text-gray-900 mb-3">No Loans Yet</h2>
+          <p className="text-gray-500 mb-8 leading-relaxed">
+            You haven't applied for any loans yet. Get started by applying for your first loan
+            and take the first step towards your educational goals.
           </p>
           <Link to="/apply">
-            <Button>
+            <Button className="shadow-lg">
               <Plus className="w-4 h-4 mr-2" />
               Apply for Loan
             </Button>
@@ -113,19 +121,32 @@ export function MyLoans() {
         </Card>
       ) : (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {loans.map((loan) => (
-            <LoanCard
-              key={loan.loanId.toString()}
-              loan={loan}
-              onMakePayment={
-                loan.status === LoanStatus.Active
-                  ? () => setSelectedLoanForPayment(loan)
-                  : undefined
-              }
-            />
+          {loans.map((loan, index) => (
+            <div key={loan.loanId.toString()} className="animate-scale-in" style={{ animationDelay: `${index * 0.1}s` }}>
+              <LoanCard
+                loan={loan}
+                onMakePayment={
+                  loan.status === LoanStatus.Active
+                    ? () => setSelectedLoanForPayment(loan)
+                    : undefined
+                }
+              />
+            </div>
           ))}
         </div>
       )}
     </div>
   );
+}
+
+// close modal on Esc key when open
+function useCloseOnEscape(isOpen: boolean, onClose: () => void) {
+  useEffect(() => {
+    if (!isOpen) return;
+    const handler = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') onClose();
+    };
+    window.addEventListener('keydown', handler);
+    return () => window.removeEventListener('keydown', handler);
+  }, [isOpen, onClose]);
 }

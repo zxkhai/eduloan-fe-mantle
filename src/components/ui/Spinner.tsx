@@ -12,7 +12,7 @@ export function Spinner({ size = 'md', className = '' }: SpinnerProps) {
     lg: 'w-8 h-8',
   };
 
-  return <Loader2 className={`animate-spin text-[#C8B2F5] ${sizes[size]} ${className}`} />;
+  return <Loader2 style={{ color: 'var(--ocean-500)' }} className={`animate-spin ${sizes[size]} ${className}`} />;
 }
 
 interface LoadingStateProps {

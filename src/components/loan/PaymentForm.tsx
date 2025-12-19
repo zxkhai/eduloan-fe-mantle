@@ -55,15 +55,15 @@ export function PaymentForm({ loanId, remainingAmount, onSuccess }: PaymentFormP
   };
 
   return (
-    <Card>
+    <Card className="glass-strong shadow-xl">
       <CardHeader>
         <CardTitle>Make a Payment</CardTitle>
       </CardHeader>
       <CardContent>
         <form onSubmit={handleSubmit} className="space-y-4">
-          <div className="p-3 bg-gray-50 rounded-lg">
-            <p className="text-sm text-gray-500">Remaining Balance</p>
-            <p className="text-lg font-bold text-gray-900">{formatMNT(remainingAmount)}</p>
+          <div className="p-4 glass-soft rounded-xl">
+            <p className="text-sm text-[#4b6b80] font-medium">Remaining Balance</p>
+            <p className="text-2xl font-bold text-ocean mt-1">{formatMNT(remainingAmount)}</p>
           </div>
 
           <div className="space-y-2">
@@ -82,15 +82,15 @@ export function PaymentForm({ loanId, remainingAmount, onSuccess }: PaymentFormP
               type="button"
               onClick={handlePayFull}
               disabled={isPending || isConfirming}
-              className="text-xs text-[#C8B2F5] hover:text-[#F2A9DD] font-medium disabled:opacity-50 disabled:cursor-not-allowed"
+              className="text-xs text-[#39bfff] hover:text-[#2fa7e6] font-semibold disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
             >
-              Pay Full Amount
+              Pay Full Amount →
             </button>
           </div>
 
           <Button
             type="submit"
-            className="w-full"
+            className="w-full shadow-lg"
             isLoading={isPending || isConfirming}
             disabled={!amount || parseFloat(amount) <= 0 || isPending || isConfirming}
           >

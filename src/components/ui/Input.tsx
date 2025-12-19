@@ -14,21 +14,15 @@ export const Input = forwardRef<HTMLInputElement, InputProps>(
     return (
       <div className="w-full">
         {label && (
-          <label htmlFor={inputId} className="block text-sm font-medium text-gray-700 mb-1.5">
+          <label htmlFor={inputId} className="block text-sm font-medium text-[#07314a] mb-1.5">
             {label}
           </label>
         )}
         <input
           ref={ref}
           id={inputId}
-          className={`
-            w-full px-3 py-2 text-sm text-gray-900 bg-white
-            border rounded-md placeholder:text-gray-400
-            focus:outline-none focus:ring-2 focus:ring-[#C8B2F5] focus:border-transparent
-            transition-shadow disabled:bg-gray-50 disabled:text-gray-500
-            ${error ? 'border-red-300' : 'border-gray-200'}
-            ${className}
-          `}
+          className={`input ${className} ${error ? 'border-red-300' : ''}`}
+          aria-invalid={!!error}
           {...props}
         />
         {error && <p className="mt-1 text-xs text-red-500">{error}</p>}
@@ -61,11 +55,12 @@ export const TextArea = forwardRef<HTMLTextAreaElement, TextAreaProps>(
           ref={ref}
           id={inputId}
           className={`
-            w-full px-3 py-2 text-sm text-gray-900 bg-white
-            border rounded-md placeholder:text-gray-400
-            focus:outline-none focus:ring-2 focus:ring-[#C8B2F5] focus:border-transparent
-            transition-shadow disabled:bg-gray-50 disabled:text-gray-500 resize-none
-            ${error ? 'border-red-300' : 'border-gray-200'}
+            w-full px-4 py-2.5 text-sm text-gray-900 bg-white
+            border-2 rounded-lg placeholder:text-gray-400
+            focus:outline-none focus:ring-2 focus:ring-[#C8B2F5]/20 focus:border-[#C8B2F5]
+            transition-all duration-200 disabled:bg-gray-50 disabled:text-gray-500 resize-none
+            hover:border-gray-300
+            ${error ? 'border-red-300 focus:border-red-500 focus:ring-red-100' : 'border-gray-200'}
             ${className}
           `}
           {...props}
